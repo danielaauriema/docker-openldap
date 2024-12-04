@@ -35,4 +35,4 @@ ldap-test:
 	-v "$(PWD)/test:/openldap/test" \
 	-v "$(PWD)/.logs:/openldap/logs" \
 	--workdir /openldap/test \
-	devops/ldap:test "${CMD_TEST}"
+	devops/ldap:test "chmod -R ugo+rwx /openldap && ${CMD_TEST}"
