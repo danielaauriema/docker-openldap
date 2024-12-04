@@ -1,4 +1,4 @@
-FROM debian:bookworm-20241111
+FROM debian:bookworm-20241111-slim
 
 RUN apt update && \
     apt install -y vim curl procps ldap-utils slapd=2.5.13+dfsg-5
