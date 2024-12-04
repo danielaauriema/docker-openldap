@@ -134,4 +134,4 @@ echo "Stopping OpenLDAP..."
 pkill slapd
 
 echo "config script finished"
-touch init
+touch "${LDAP_ROOT_PATH}/logs/init"
