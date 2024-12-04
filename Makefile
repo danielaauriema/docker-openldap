@@ -30,7 +30,7 @@ local:
 	devops/ldap:test "${CMD_LOCAL}"
 
 ldap-test:
-	docker run -it --rm \
+	docker run --rm \
 	-v "$(PWD)/start:/openldap/start" \
 	-v "$(PWD)/test:/openldap/test" \
 	-v "$(PWD)/.logs:/openldap/logs" \
