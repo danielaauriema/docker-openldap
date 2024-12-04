@@ -1,5 +1,12 @@
-CMD?=./entrypoint.sh
+ifdef CMD
+	CMD_TEST=${CMD}
+	CMD_LOCAL=${CMD}
+else
+	CMD_TEST=./test.sh
+	CMD_LOCAL=./entrypoint.sh
+endif
 
+.PHONI: build run start config local ldap-test
 build_and_run: build run
 
 build:
@@ -14,14 +21,18 @@ start:
 config:
 	docker run -it --rm devops/ldap:test "./config.sh"
 
+# usage: make local CMD=/bin/bash
 local:
-	docker run -it --rm -v "$(PWD)/start:/openldap/start" devops/ldap:test "${CMD}"
-
-bash:
-	docker run -it --rm --entrypoint /bin/bash devops/ldap:test
-
-test_config:
 	docker run -it --rm \
 	-v "$(PWD)/start:/openldap/start" \
-	-v "$(PWD)/test/test_config.sh:/openldap/start/test_config.sh" \
-	devops/ldap:test "./test_config.sh"
+	-v "$(PWD)/test:/openldap/test" \
+	-v "$(PWD)/.logs:/openldap/logs" \
+	devops/ldap:test "${CMD_LOCAL}"
+
+ldap-test:
+	docker run -it --rm \
+	-v "$(PWD)/start:/openldap/start" \
+	-v "$(PWD)/test:/openldap/test" \
+	-v "$(PWD)/.logs:/openldap/logs" \
+	--workdir /openldap/test \
+	devops/ldap:test "${CMD_TEST}"

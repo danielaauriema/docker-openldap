@@ -2,7 +2,7 @@
 
 echo "*** Starting OpenLDAP..."
 
-if [ ! -f "init" ]; then
+if [ ! -f "${LDAP_ROOT_PATH}/logs/init" ]; then
   if ! ./config.sh; then
       echo "*** LDAP CONFIGURATION ERROR"
       exit 1
