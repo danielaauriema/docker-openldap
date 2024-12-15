@@ -25,6 +25,8 @@ mkdir -p "${LDAP_DATA_PATH}"
 cp /var/lib/ldap/** "${LDAP_DATA_PATH}"
 chmod -R ugo+rw "${LDAP_DATA_PATH}"
 
+mv "/etc/ldap/slapd.d/" "${LDAP_CONF_PATH}"
+
 slapmodify -b "cn=config" -F "${LDAP_CONF_PATH}" <<EOF
 dn: olcDatabase={1}mdb,cn=config
 changetype: modify
