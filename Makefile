@@ -22,7 +22,7 @@ config:
 	devops/ldap:test "/opt/startup/config.sh"
 
 test:
-	@docker run -it --rm \
+	@docker run -t --rm \
 	-v "${V_TEST}" \
 	-v "${V_STARTUP}" \
 	-v "${V_BASH_TEST}" \
