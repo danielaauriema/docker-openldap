@@ -8,9 +8,8 @@ endif
 
 V_TEST="$(PWD)/test:/opt/test"
 V_STARTUP="$(PWD)/startup:/opt/startup"
-V_BASH_TEST="$(PWD)/bash-test:/opt/bash-test"
 
-.PHONY: build config test run start stop
+.PHONY: build config test ci-test run start stop
 
 build:
 	@docker build --no-cache -t devops/ldap:test .
@@ -25,7 +24,12 @@ test:
 	@docker run -t --rm \
 	-v "${V_TEST}" \
 	-v "${V_STARTUP}" \
-	-v "${V_BASH_TEST}" \
+	--workdir /opt/test \
+	devops/ldap:test "${CMD_TEST}"
+
+ci-test:
+	@docker run -t --rm \
+	-v "${V_TEST}" \
 	--workdir /opt/test \
 	devops/ldap:test "${CMD_TEST}"
 
