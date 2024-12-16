@@ -1,3 +1,2 @@
 .idea
-.logs/**
-test/bash-test.sh
+bash-test

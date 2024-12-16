@@ -6,33 +6,43 @@ else
 	CMD_LOCAL=./entrypoint.sh
 endif
 
-.PHONI: build run start config local ldap-test
-build_and_run: build run
+V_TEST="$(PWD)/test:/opt/test"
+V_STARTUP="$(PWD)/startup:/opt/startup"
+V_BASH_TEST="$(PWD)/bash-test:/opt/bash-test"
+
+.PHONY: build config test run start stop
 
 build:
-	docker build --no-cache -t devops/ldap:test .
-
-run:
-	docker run -it --rm devops/ldap:test
-
-start:
-	docker run -it --rm devops/ldap:test "./start.sh"
+	@docker build --no-cache -t devops/ldap:test .
 
 config:
-	docker run -it --rm devops/ldap:test "./config.sh"
+	@docker run -it --rm \
+	-v "${V_CACHE}" \
+	-v "${V_STARTUP}" \
+	devops/ldap:test "/opt/startup/config.sh"
 
-# usage: make local CMD=/bin/bash
-local:
-	docker run -it --rm \
-	-v "$(PWD)/start:/openldap/start" \
-	-v "$(PWD)/test:/openldap/test" \
-	-v "$(PWD)/.logs:/openldap/logs" \
-	devops/ldap:test "${CMD_LOCAL}"
+test:
+	@mkdir -p "bash-test"
+	@docker run -it --rm \
+	-v "${V_TEST}" \
+	-v "${V_STARTUP}" \
+	-v "${V_BASH_TEST}" \
+	--workdir /opt/test \
+	devops/ldap:test "${CMD_TEST}"
 
-ldap-test:
-	docker run --rm \
-	-v "$(PWD)/start:/openldap/start" \
-	-v "$(PWD)/test:/openldap/test" \
-	-v "$(PWD)/.logs:/openldap/logs" \
-	--workdir /openldap/test \
-	devops/ldap:test "chmod -R ugo+rwx /openldap && ${CMD_TEST}"
+run:
+	@docker run -it --rm \
+	--name ldap-test \
+	-v "${V_CACHE}" \
+	-v "${V_STARTUP}" \
+	devops/ldap:test
+
+start:
+	@docker run -d --rm \
+	--name ldap-test \
+	-v "${V_CACHE}" \
+	-v "${V_STARTUP}" \
+	devops/ldap:test
+
+stop:
+	@docker stop ldap-test

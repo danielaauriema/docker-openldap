@@ -2,7 +2,7 @@
 
 @ Load config
 + Execute config.sh
-(cd ../start && ./config.sh > /dev/null 2> /dev/null)
+(/opt/startup/config.sh > /dev/null 2> /dev/null)
 
 @ LDAP base
 

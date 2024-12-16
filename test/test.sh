@@ -1,9 +1,12 @@
 #!/bin/bash
 set -e
 
-if [ ! -f "./bash-test.sh" ]; then
-  curl -s "https://raw.githubusercontent.com/danielaauriema/bash-tools/master/lib/bash-test.sh" > "./bash-test.sh"
-  chmod ugo+rwx "./bash-test.sh"
-fi
+BASH_TEST="/opt/bash-test/bash-test.sh"
 
-./bash-test.sh ./test-config.sh
+if [ ! -f "${BASH_TEST}" ]; then
+  curl -s "https://raw.githubusercontent.com/danielaauriema/bash-tools/master/lib/bash-test.sh" > "${BASH_TEST}"
+  chmod ugo+rx "${BASH_TEST}"
+fi
+. "${BASH_TEST}"
+
+bash_test "/opt/test/test-config.sh"
