@@ -1,7 +1,12 @@
 #!/bin/bash
 set -e
 
-echo "running config script..."
+_log(){
+  echo "*** openldap-config :: $1"
+}
+_log "starting config script..."
+
+. /opt/lib/bash-wait.sh
 
 cat <<EOF | debconf-set-selections
 slapd slapd/internal/generated_adminpw password ${LDAP_ADMIN_PASSWORD}
@@ -21,9 +26,14 @@ EOF
 
 dpkg-reconfigure -f noninteractive slapd
 
+mkdir -p "${LDAP_ROOT_PATH}/logs"
+chmod -R ugo+rw "${LDAP_ROOT_PATH}"
+
 mkdir -p "${LDAP_DATA_PATH}"
 cp /var/lib/ldap/** "${LDAP_DATA_PATH}"
 chmod -R ugo+rw "${LDAP_DATA_PATH}"
+
+_log "change LDAP config and data paths"
 
 mv "/etc/ldap/slapd.d/" "${LDAP_CONF_PATH}"
 
@@ -34,11 +44,13 @@ replace: olcDbDirectory
 olcDbDirectory: ${LDAP_DATA_PATH}
 EOF
 
-echo "Starting Open LDAP..."
-slapd -h "ldapi:/// ldap:///" -F "${LDAP_CONF_PATH}"
+_log "starting Open LDAP..."
+slapd -h "ldapi:///" -F "${LDAP_CONF_PATH}"
 
-while ! ldapsearch -H "ldapi://" -Y EXTERNAL -b "${LDAP_BASE_DN}"; do sleep 0.1; done
+_log "waiting for LDAP to start..."
+bash_wait_for "ldapsearch -H \"ldapi://\" -Y EXTERNAL -b \"${LDAP_BASE_DN}\" > /dev/null  2>/dev/null"
 
+_log "adding Open LDAP modules..."
 ldapmodify -Y EXTERNAL -H "ldapi:///" -Q -v <<EOF
 dn: cn=module{0},cn=config
 add: olcmoduleload
@@ -53,6 +65,7 @@ replace: olcLogLevel
 olcLogLevel: -1
 EOF
 
+_log "enable Open LDAP member of..."
 ldapadd -Y EXTERNAL -H "ldapi:///" -Q -v <<EOF
 dn: olcOverlay=memberof,olcDatabase={1}${LDAP_BACKEND},cn=config
 objectClass: olcOverlayConfig
@@ -82,6 +95,7 @@ olcDbIndex: memberOf eq
 olcDbIndex: objectClass eq
 EOF
 
+_log "config Open LDAP access..."
 ldapmodify -Y EXTERNAL -H "ldapi:///" -Q -v <<EOF
 dn: olcDatabase={1}${LDAP_BACKEND},cn=config
 changetype: modify
@@ -93,6 +107,7 @@ olcAccess: to attrs=userPassword,shadowLastChange by self write by dn="cn=admin,
 olcAccess: to * by self read by dn="cn=admin,${LDAP_BASE_DN}" write by dn="cn=${LDAP_BIND_USERNAME},${LDAP_BASE_DN}" read by * none
 EOF
 
+_log "adding custom groups and users..."
 ldapadd -H "ldapi:///" -x -D "cn=${LDAP_ADMIN_USERNAME},${LDAP_BASE_DN}" -w "$LDAP_ADMIN_PASSWORD" -v <<EOF
 dn: ou=groups,${LDAP_BASE_DN}
 objectClass: top
@@ -132,8 +147,8 @@ cn: admin
 member: cn=${LDAP_DEFAULT_USERNAME},ou=users,${LDAP_BASE_DN}
 EOF
 
-echo "Stopping OpenLDAP..."
+_log "stopping Open LDAP..."
 pkill slapd
 
-echo "config script finished"
+_log "config script finished successful!"
 touch "${LDAP_ROOT_PATH}/logs/init"

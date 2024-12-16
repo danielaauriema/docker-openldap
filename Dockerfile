@@ -1,7 +1,9 @@
-FROM debian:bookworm-20241111-slim
+FROM debian:bookworm-slim
 
 RUN apt update && \
-    apt install -y vim curl procps ldap-utils slapd=2.5.13+dfsg-5
+    apt install -y vim curl procps ldap-utils slapd=2.5.13+dfsg-5 && \
+    mkdir -p /opt/lib && \
+    curl -s https://raw.githubusercontent.com/danielaauriema/bash-tools/master/lib/bash-wait.sh > /opt/lib/bash-wait.sh
 
 ENV LDAP_ORGANIZATION="devops-tools"
 ENV LDAP_DOMAIN="devops-tools.local"
@@ -27,10 +29,8 @@ ENV LDAP_AUTO_START=true
 EXPOSE 389
 EXPOSE 636
 
-RUN mkdir -p ${LDAP_ROOT_PATH}/logs && chmod -R ugo+rw ${LDAP_ROOT_PATH}
+ADD startup /opt/startup
+WORKDIR /opt/startup
 
-ADD start ${LDAP_ROOT_PATH}/start
-WORKDIR ${LDAP_ROOT_PATH}/start
-
-ENTRYPOINT [ "/bin/bash", "-c" ]
-CMD [ "./entrypoint.sh" ]
+ENTRYPOINT [ "/opt/startup/entrypoint" ]
+CMD []
