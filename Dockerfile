@@ -30,7 +30,7 @@ EXPOSE 389
 EXPOSE 636
 
 ADD startup /opt/startup
-RUN chmod -R ugo+rwx /opt/startup /opt/lib
+RUN chmod -R +rx /opt/startup /opt/lib
 WORKDIR /opt/startup
 
 ENTRYPOINT [ "/opt/startup/entrypoint" ]

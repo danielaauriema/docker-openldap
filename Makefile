@@ -1,9 +1,7 @@
 ifdef CMD
 	CMD_TEST=${CMD}
-	CMD_LOCAL=${CMD}
 else
-	CMD_TEST=./test.sh
-	CMD_LOCAL=./entrypoint.sh
+	CMD_TEST=chmod -R +x /opt/test && /opt/test/test.sh
 endif
 
 V_TEST="$(PWD)/test:/opt/test"
@@ -16,35 +14,30 @@ build:
 
 config:
 	@docker run -it --rm \
-	-v "${V_CACHE}" \
-	-v "${V_STARTUP}" \
+	-v "$(V_STARTUP)" \
 	devops/ldap:test "/opt/startup/config.sh"
 
 test:
-	@docker run -t --rm \
-	-v "${V_TEST}" \
-	-v "${V_STARTUP}" \
-	--workdir /opt/test \
-	devops/ldap:test "${CMD_TEST}"
+	@docker run -it --rm \
+	-v "$(V_TEST)" \
+	-v "$(V_STARTUP)" \
+	devops/ldap:test "$(CMD_TEST)"
 
 ci-test:
-	@docker run -t --rm \
-	-v "${V_TEST}" \
-	--workdir /opt/test \
-	devops/ldap:test "${CMD_TEST}"
+	@docker run --rm \
+	-v "${RUNNER_WORKSPACE}/openldap/test:/opt/test" \
+	devops/ldap:test "$(CMD_TEST)"
 
 run:
 	@docker run -it --rm \
 	--name ldap-test \
-	-v "${V_CACHE}" \
-	-v "${V_STARTUP}" \
+	-v "$(V_STARTUP)" \
 	devops/ldap:test
 
 start:
 	@docker run -d --rm \
 	--name ldap-test \
-	-v "${V_CACHE}" \
-	-v "${V_STARTUP}" \
+	-v "$(V_STARTUP)" \
 	devops/ldap:test
 
 stop:
