@@ -4,7 +4,7 @@ set -e
 _log(){
   echo "*** openldap-config :: $1"
 }
-_log "starting config script..."
+_log "starting..."
 
 . /opt/lib/bash-wait.sh
 

@@ -5,19 +5,19 @@ RUN apt update && \
     mkdir -p /opt/lib && \
     curl -s https://raw.githubusercontent.com/danielaauriema/bash-tools/master/lib/bash-wait.sh > /opt/lib/bash-wait.sh
 
-ENV LDAP_ORGANIZATION="devops-tools"
-ENV LDAP_DOMAIN="devops-tools.local"
-ENV LDAP_BASE_DN="dc=devops-tools,dc=local"
+ENV LDAP_ORGANIZATION="openldap"
+ENV LDAP_DOMAIN="openldap.local"
+ENV LDAP_BASE_DN="dc=openldap,dc=local"
 
 ENV LDAP_ADMIN_USERNAME="admin"
 ENV LDAP_ADMIN_PASSWORD="password"
 ENV LDAP_BIND_USERNAME="bind"
 ENV LDAP_BIND_PASSWORD="password"
-ENV LDAP_DEFAULT_USERNAME="devops"
+ENV LDAP_DEFAULT_USERNAME="openldap"
 ENV LDAP_DEFAULT_PASSWORD="password"
 
 ENV LDAP_BACKEND="mdb"
-ENV LDAP_ROOT_PATH="/openldap"
+ENV LDAP_ROOT_PATH="/data"
 ENV LDAP_CONF_PATH="${LDAP_ROOT_PATH}/slapd.d"
 ENV LDAP_DATA_PATH="${LDAP_ROOT_PATH}/data"
 ENV LDAP_LOG_LEVEL=-1
@@ -30,7 +30,7 @@ EXPOSE 389
 EXPOSE 636
 
 ADD startup /opt/startup
-RUN chmod -R +rx /opt/startup /opt/lib
+RUN chmod -R +x /opt/startup /opt/lib
 WORKDIR /opt/startup
 
 ENTRYPOINT [ "/opt/startup/entrypoint" ]
