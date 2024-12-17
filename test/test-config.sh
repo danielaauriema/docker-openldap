@@ -7,7 +7,7 @@
 @ LDAP base
 
 + Test organization
-slapcat -F "${LDAP_CONF_PATH}" -b "${LDAP_BASE_DN}" -a "(&(objectClass=organization)(dc=${LDAP_ORGANIZATION}))" | grep "dc: devops-tools"
+slapcat -F "${LDAP_CONF_PATH}" -b "${LDAP_BASE_DN}" -a "(&(objectClass=organization)(dc=${LDAP_ORGANIZATION}))" | grep "dc: openldap"
 
 + Check LDAP data path: ${LDAP_DATA_PATH}
 ls "${LDAP_DATA_PATH}" | grep "data.mdb"
