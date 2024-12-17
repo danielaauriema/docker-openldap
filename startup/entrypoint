@@ -1,15 +1,13 @@
 #!/bin/bash
 
-echo "*** Starting OpenLDAP..."
+echo "*** Starting Open LDAP entrypoint.."
 
 if [ $# -gt 0 ]; then
-    exec "$@"
+    eval "$@"
 else
-  if [ ! -f "${LDAP_ROOT_PATH}/logs/init" ]; then
-    if ! ./config.sh; then
-        echo "*** LDAP CONFIGURATION ERROR"
-        exit 1
-    fi
+  if [ ! -f "${LDAP_ROOT_PATH}/logs/init" ] && (! ./config.sh) ; then
+    echo "*** Open LDAP CONFIGURATION ERROR"
+    exit 1
   fi
 
   declare -a LDAP_HOSTS=()

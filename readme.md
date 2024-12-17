@@ -5,5 +5,5 @@ This project aims to create an open LDAP container with my own initial configura
 usage:
 
 ```
-docker pull ghcr.io/danielaauriema/docker-openldap:latest
+docker pull ghcr.io/danielaauriema/openldap:latest
 ```

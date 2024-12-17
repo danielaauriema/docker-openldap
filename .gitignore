@@ -1,2 +1,2 @@
 .idea
-bash-test
+test/bash-test.sh

@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-BASH_TEST="/opt/bash-test/bash-test.sh"
+BASH_TEST="/opt/test/bash-test.sh"
 
 if [ ! -f "${BASH_TEST}" ]; then
   curl -s "https://raw.githubusercontent.com/danielaauriema/bash-tools/master/lib/bash-test.sh" > "${BASH_TEST}"
